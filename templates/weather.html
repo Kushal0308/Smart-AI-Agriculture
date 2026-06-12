@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 data-aos="fade-down">Weather Information</h2>
+
+<form id="weatherForm" method="POST" action="{{ url_for('weather') }}" data-aos="zoom-in" data-aos-delay="100">
+  <label for="city">Enter City Name or Coordinates:</label>
+  <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <input type="text" id="city" name="city" required placeholder="e.g. London..." style="flex: 0 0 5cm; width: 5cm; margin: 0; padding: 14px 16px; font-size: 1.1rem; border-radius: var(--radius-md);">
+    <button type="button" id="geoBtn" style="background: #eab308; color: #1f2937; margin: 0; white-space: nowrap;" onclick="getLocation()">📍 Auto-Locate</button>
+  </div>
+  <button type="submit" style="width: 100%;">Analyze Local Weather</button>
+</form>
+
+{% if error %}
+<div class="highlight animate-pop" style="background: rgba(239, 68, 68, 0.1); border-left-color: #ef4444; color: #ef4444; margin-bottom: 25px;">
+    <h3 style="color: #ef4444;">⚠️ Weather Access Error</h3>
+    <p>{{ error }}</p>
+    <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 10px;">Check your <strong>.env</strong> file for a valid <strong>WEATHER_API_KEY</strong>.</p>
+</div>
+{% endif %}
+
+<script>
+function getLocation() {
+  const btn = document.getElementById('geoBtn');
+  const cityInput = document.getElementById('city');
+  
+  if (navigator.geolocation) {
+    btn.innerHTML = "Locating...";
+    btn.style.opacity = "0.7";
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude.toFixed(4);
+      const lon = position.coords.longitude.toFixed(4);
+      cityInput.value = lat + "," + lon;
+      btn.innerHTML = "📍 Found";
+      btn.style.opacity = "1";
+    }, function(error) {
+      btn.innerHTML = "📍 Failed";
+      btn.style.opacity = "1";
+      alert("Unable to retrieve location. Please ensure location permissions are enabled or type your city manually.");
+    });
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+</script>
+
+{% if weather %}
+  <div class="highlight" data-aos="fade-right" data-aos-delay="200">
+    <h3>🌍 Weather in {{ weather.city }}</h3>
+    <ul>
+      <li><strong>Temperature:</strong> {{ weather.temperature }} °C</li>
+      <li><strong>Humidity:</strong> {{ weather.humidity }} %</li>
+      <li><strong>Rainfall:</strong> {{ weather.rainfall }} mm</li>
+      <li><strong>Condition:</strong> {{ weather.condition }}</li>
+    </ul>
+  </div>
+{% endif %}
+
+{% if advice %}
+  <div data-aos="fade-left" data-aos-delay="300" class="highlight" style="border-left-color: #3b82f6;">
+    <h3>💧 Irrigation Advice</h3>
+    <p>{{ advice }}</p>
+  </div>
+{% endif %}
+
+{% if servo_status %}
+  <div data-aos="fade-up" data-aos-delay="400" class="highlight" style="border-left-color: #f59e0b;">
+    <h3>⚙️ IoT Device Simulation</h3>
+    <p>Servo Motor Status: <strong>{{ servo_status }}</strong></p>
+    <p style="font-size: 0.9em; opacity: 0.8;">(Software simulation overview)</p>
+  </div>
+{% endif %}
+
+<!-- Manual Control Buttons -->
+<div data-aos="zoom-in" data-aos-delay="500" class="highlight">
+  <h3>🛠️ Manual Relay Control</h3>
+  <form method="POST" action="{{ url_for('servo') }}" style="box-shadow: none; padding: 0; background: transparent; border: none; margin: 15px 0 0 0;">
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+      <button type="submit" name="action" value="open" style="background: var(--primary);">Start Water Flow (Open)</button>
+      <button type="submit" name="action" value="close" style="background: #ef4444;">Stop Water Flow (Close)</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

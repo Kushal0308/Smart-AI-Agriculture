@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 data-aos="fade-down">Farmer Portal Login</h1>
+
+{% if error %}
+  <div class="highlight" data-aos="fade-right">
+    <p>{{ error }}</p>
+  </div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('login') }}" data-aos="zoom-in" data-aos-delay="200">
+  <label for="username">Username</label>
+  <input type="text" id="username" name="username" required placeholder="Enter your username">
+
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required placeholder="***">
+
+  <button type="submit">Login to Dashboard</button>
+</form>
+
+<div class="closing" data-aos="fade-up" data-aos-delay="300">
+  <p>New to Smart Farming? <a href="{{ url_for('signup') }}">Sign up here</a></p>
+  <p style="margin-top: 10px;"><a href="{{ url_for('forgot_password') }}" style="color: #E50914; font-weight: 600; text-decoration: none;">Forgot Password?</a></p>
+</div>
+{% endblock %}

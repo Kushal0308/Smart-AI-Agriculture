@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Farming App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- AOS animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Professional Hover Dropdowns via CSS */
+    .translate-container:hover .translate-dropdown,
+    .profile-container:hover .profile-dropdown { 
+      display: flex !important; 
+      visibility: visible;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .translate-dropdown, .profile-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,0,0,0.05) !important;
+      border-radius: 12px !important;
+      padding: 12px !important;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 180px;
+      z-index: 1000;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
+      transition: all 0.3s ease;
+    }
+
+    /* Unify Logo Branding */
+    .logo {
+      color: #E50914; 
+      font-weight: 800; 
+      font-size: 1.6rem; 
+      letter-spacing: 1.5px; 
+      font-family: 'Inter', sans-serif;
+      text-transform: uppercase;
+      transition: 0.3s;
+    }
+    .logo:hover { opacity: 0.8; }
+    
+    .trans-btn { width:100%; text-align:left; background:transparent; padding:10px 14px; border:none; color:#1e293b; font-weight:600; cursor:pointer; font-size: 0.95rem; box-shadow:none; border-radius: 8px; transition: 0.2s; text-decoration: none; }
+    .trans-btn:hover { background: rgba(16, 185, 129, 0.1); color: #10B981 !important; transform: translateX(5px); }
+    .goog-te-banner-frame { display: none !important; } 
+    body { top: 0 !important; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Backdrop -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar();"></div>
+
+  <!-- Sidebar Sidebar Navigation -->
+  <aside class="sidebar" id="mainSidebar">
+    <div class="sidebar-header" style="padding: 25px;">
+      <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none; display: block;">SMARTFARM</a>
+    </div>
+    <ul>
+      <li><a href="{{ url_for('home') }}" class="sidebar-link">🏠 Home</a></li>
+      <li><a href="{{ url_for('contact') }}" class="sidebar-link">📬 Contact Us</a></li>
+      {% if 'username' in session %}
+      <hr style="border-color: rgba(0,0,0,0.05); margin: 15px 0;">
+      <li><a href="{{ url_for('crop_requirement') }}" class="sidebar-link">🌾 Crop Reqs</a></li>
+      <li><a href="{{ url_for('crop_damage') }}" class="sidebar-link">🛡️ Threat Guard</a></li>
+      <li><a href="{{ url_for('disease_scan') }}" class="sidebar-link">📷 Disease Scan</a></li>
+      <li><a href="{{ url_for('weather') }}" class="sidebar-link">☁️ Weather Irrigation</a></li>
+      <li><a href="{{ url_for('market') }}" class="sidebar-link">📈 Market Trends</a></li>
+      <li><a href="{{ url_for('admin') }}" class="sidebar-link">⚙️ Admin Control</a></li>
+      <li><a href="{{ url_for('water_level') }}" class="sidebar-link">💧 Water Level</a></li>
+      <li><a href="{{ url_for('soil_moisture') }}" class="sidebar-link">🌱 Soil Probes</a></li>
+      {% endif %}
+    </ul>
+    
+    {% if 'username' in session %}
+    <div class="sidebar-footer">
+       <a href="{{ url_for('logout') }}" class="sidebar-link" style="color: #ef4444; font-weight: 800;">🔒 Logout</a>
+    </div>
+    {% endif %}
+  </aside>
+
+  <nav data-aos="fade-down" data-aos-duration="800" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; box-sizing: border-box; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000;">
+    <!-- LEFT SIDE: Hamburger + Logo -->
+    <div class="nav-left" style="display: flex; align-items: center; gap: 20px;">
+      <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle Menu">
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+        <div class="hamburger-line"></div>
+      </button>
+      <a href="{{ url_for('home') }}" class="logo" style="text-decoration: none;">SMARTFARM</a>
+    </div>
+
+    <!-- RIGHT SIDE: Utilities -->
+    <div class="nav-right">
+      <ul style="display: flex; list-style: none; margin: 0; padding: 0; gap: 25px; align-items: center;">
+        <li class="translate-container" style="position: relative; display: flex; align-items: center; cursor: pointer;">
+          <a style="display:flex; align-items:center; gap:6px;"><span class="nav-icon" title="Translate">🌐</span> <span class="nav-text" style="font-size:0.95rem; font-weight: 600; color: #1e293b;">Translate</span></a>
+          <div class="translate-dropdown">
+             <button class="trans-btn" type="button" onclick="changeLang('en')">English</button>
+             <button class="trans-btn" type="button" onclick="changeLang('hi')">Hindi</button>
+             <button class="trans-btn" type="button" onclick="changeLang('kn')">Kannada</button>
+             <button class="trans-btn" type="button" onclick="changeLang('ta')">Tamil</button>
+             <button class="trans-btn" type="button" onclick="changeLang('te')">Telugu</button>
+             <button class="trans-btn" type="button" onclick="changeLang('bn')">Bengali</button>
+          </div>
+        </li>
+        <li style="cursor: pointer; display:flex; align-items:center;" onclick="toggleReadAloud()">
+          <a style="display:flex; align-items:center; gap:6px;">
+            <span class="nav-icon" id="tts-icon" title="Read Aloud">📢</span> 
+            <span class="nav-text" id="tts-text" style="font-size:0.95rem; font-weight: 600; color: #1e293b;">Read Aloud</span>
+          </a>
+        </li>
+        {% if 'username' in session %}
+        <li class="profile-container" style="position: relative; display: flex; align-items: center; cursor: pointer;">
+          <a href="{{ url_for('profile') }}" style="display:flex; align-items:center; justify-content:center; gap:6px; background: #E50914; color: white; padding: 6px 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(229, 9, 20, 0.2); transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
+             <span style="font-size: 1.3rem; line-height:1;">🧑‍🌾</span> <span style="font-size:0.75rem; font-weight:800; padding-left:2px;">DASHBOARD ▼</span>
+          </a>
+          <div class="profile-dropdown">
+             <a href="{{ url_for('profile') }}" class="trans-btn">🧑‍🌾 Dashboard Room</a>
+             <hr style="border-color: rgba(0,0,0,0.05); margin: 5px 0;">
+             <a href="{{ url_for('crop_requirement') }}" class="trans-btn">🌾 Crop Reqs</a>
+             <a href="{{ url_for('crop_damage') }}" class="trans-btn">🛡️ Threat Guard</a>
+             <a href="{{ url_for('disease_scan') }}" class="trans-btn">📷 Disease Scan</a>
+             <a href="{{ url_for('weather') }}" class="trans-btn">☁️ Weather Irrigation</a>
+             <a href="{{ url_for('market') }}" class="trans-btn">📈 Market Trends</a>
+             <a href="{{ url_for('admin') }}" class="trans-btn">⚙️ Admin Control</a>
+             <a href="{{ url_for('water_level') }}" class="trans-btn">💧 Water Level</a>
+             <a href="{{ url_for('soil_moisture') }}" class="trans-btn">🌱 Soil Probes</a>
+             <hr style="border-color: rgba(0,0,0,0.05); margin: 5px 0;">
+             <a href="{{ url_for('logout') }}" class="trans-btn" style="color: #ef4444 !important; font-weight: 800; text-align: center;">🔒 Secure Logout</a>
+          </div>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <main class="content" data-aos="fade-up" data-aos-duration="1000">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Smart Farming Project</p>
+  </footer>
+
+  <!-- AOS JS -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>AOS.init({ duration: 1000, once: true });</script>
+  
+  <script type="text/javascript">
+    // Sidebar Logic
+    function toggleSidebar() {
+      const sidebar = document.getElementById('mainSidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
+
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en', 
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+    
+    function changeLang(langCode) {
+      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + location.hostname + ";";
+      if (langCode !== 'en') {
+        document.cookie = "googtrans=/auto/" + langCode + "; path=/;";
+      }
+      window.location.reload();
+    }
+    
+    let isReading = false;
+    let utterance = null;
+    
+    function toggleReadAloud() {
+      if (!('speechSynthesis' in window)) {
+        alert("Sorry, your browser doesn't support text-to-speech!");
+        return;
+      }
+      const ttsIcon = document.getElementById("tts-icon");
+      const ttsText = document.getElementById("tts-text");
+      
+      if (isReading) {
+        window.speechSynthesis.cancel();
+        isReading = false;
+        ttsIcon.innerText = "📢";
+        ttsText.innerText = "Read Aloud";
+      } else {
+        window.speechSynthesis.cancel();
+        let contentEl = document.querySelector('main.content');
+        if (!contentEl) return;
+        utterance = new SpeechSynthesisUtterance(contentEl.innerText);
+        let langMatch = document.cookie.match(/googtrans=\/(?:auto|en)\/([a-z]{2})/i);
+        let currentLang = langMatch ? langMatch[1] : 'en';
+        const localeMap = { 'hi': 'hi-IN', 'kn': 'kn-IN', 'ta': 'ta-IN', 'te': 'te-IN', 'bn': 'bn-IN', 'en': 'en-US' };
+        if (localeMap[currentLang]) utterance.lang = localeMap[currentLang];
+        utterance.onend = function() {
+          isReading = false;
+          ttsIcon.innerText = "📢";
+          ttsText.innerText = "Read Aloud";
+        };
+        window.speechSynthesis.speak(utterance);
+        isReading = true;
+        ttsIcon.innerText = "⏹️";
+        ttsText.innerText = "Stop Reading";
+      }
+    }
+  </script>
+  <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

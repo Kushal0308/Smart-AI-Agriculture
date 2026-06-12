@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Calculator Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-container">
+        <h1 class="title">Flask Calc</h1>
+        
+        <form method="POST" class="calc-form">
+            <div class="input-group">
+                <input type="number" step="any" name="num1" placeholder="First Number" required>
+                <input type="number" step="any" name="num2" placeholder="Second Number" required>
+            </div>
+
+            <div class="operations">
+                <button type="submit" name="operation" value="add" class="op-btn">+</button>
+                <button type="submit" name="operation" value="subtract" class="op-btn">-</button>
+                <button type="submit" name="operation" value="multiply" class="op-btn">×</button>
+                <button type="submit" name="operation" value="divide" class="op-btn">÷</button>
+            </div>
+        </form>
+
+        {% if result is not none %}
+        <div class="result-box animate-pop">
+            <span class="label">Result</span>
+            <div class="value">{{ result }}</div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error-box">
+            {{ error }}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .market-container { max-width: 1200px; margin: 0 auto; }
+  .market-form { margin-bottom: 35px; background: var(--glass-bg); padding: 30px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); }
+  .market-input { width: 100%; margin: 10px 0 20px 0; padding: 14px 16px; font-size: 1.1rem; border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); background: white; color: #1e293b; transition: 0.3s; }
+  .market-input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
+  .market-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 30px; font-weight: 800; border-radius: var(--radius-sm); border: none; cursor: pointer; transition: 0.3s; }
+  .market-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
+  .analysis-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+  .crop-card { flex: 1; min-width: 320px; background: white; border-radius: var(--radius-md); padding: 25px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: 0.3s; border-left: 6px solid var(--trend-color); }
+  .crop-card:hover { transform: translateY(-5px); }
+  .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(30, 41, 59, 0.05); padding-bottom: 15px; margin-bottom: 20px; }
+  .card-title { margin: 0; font-size: 1.5rem; color: #1e293b; font-weight: 800; }
+  .trend-label { display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 800; letter-spacing: 0.5px; }
+  .trend-value { font-size: 1.4rem; font-weight: 800; color: var(--trend-color); }
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+  .metric-box { background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.03); }
+  .metric-label { display: block; font-size: 0.7rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+  .metric-val { font-size: 1.1rem; font-weight: 800; color: var(--trend-color, #1e293b); }
+  .metric-unit { font-size: 0.65rem; color: #94a3b8; margin-left: 2px; }
+  .strategy-box { background: rgba(16, 185, 129, 0.05); padding: 18px; border-radius: 12px; border: 1px dashed rgba(16, 185, 129, 0.3); }
+  .strategy-title { margin: 0 0 8px 0; font-size: 0.85rem; color: #065f46; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+  .strategy-text { margin: 0; font-size: 0.95rem; line-height: 1.6; color: #1e293b; }
+  
+  /* Trend Theme Classes - Linter Safe */
+  .trend-up, .trend-bullish { --trend-color: #10b981; }
+  .trend-down, .trend-bearish { --trend-color: #ef4444; }
+  .trend-stable { --trend-color: #eab308; }
+</style>
+
+<div class="market-container">
+  <h2 data-aos="fade-down">📈 Smart Market Hub</h2>
+  <p data-aos="fade-in" data-aos-delay="100">
+    Access real-time commodity indices and strategic economic modeling powered by <strong>Gemini AI</strong>. 
+  </p>
+
+  <form method="POST" action="{{ url_for('market') }}" class="market-form" data-aos="zoom-in" data-aos-delay="200">
+    <label for="crop_search" style="font-weight: 700; color: #1e293b;">Search Commodity Trend:</label>
+    <input type="text" id="crop_search" name="crop_search" class="market-input" required placeholder="e.g. Soybeans, Corn, Coffee...">
+    
+    <div style="display: flex; justify-content: flex-end;">
+      <button type="submit" class="market-btn">🔍 ANALYZE MARKET</button>
+    </div>
+  </form>
+
+  {% if status_msg %}
+  <div style="background: rgba(16, 185, 129, 0.1); color: #065f46; padding: 15px 25px; border-radius: 10px; margin-bottom: 30px; font-weight: 600; border: 1px solid rgba(16, 185, 129, 0.2); animation: fadeIn 0.5s ease;">
+    {{ status_msg }}
+  </div>
+  {% endif %}
+
+  {% if searched %}
+    {% if commodities %}
+      <div class="analysis-grid">
+        {% for crop in commodities %}
+        <div class="crop-card trend-{{ crop.trend }}" data-aos="fade-up">
+          <!-- Multi-Source Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+              <div>
+                  <h3 class="card-title">{{ crop.name }} Overview</h3>
+                  <div style="display: flex; gap: 8px; margin-top: 5px;">
+                      {% if crop.factual %}
+                      <span style="font-size: 0.65rem; background: #3b82f6; color: white; padding: 3px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase;">📊 Mandi Dataset</span>
+                      {% endif %}
+                      {% if crop.verified %}
+                      <span style="font-size: 0.65rem; background: #10b981; color: white; padding: 3px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase;">🌿 Botanical API</span>
+                      {% endif %}
+                  </div>
+              </div>
+              <div style="text-align: right;">
+                  <span class="trend-label">Projected Swing</span>
+                  <span class="trend-value" style="color: var(--trend-color, #10b981);">
+                     {% if crop.trend == 'up' %}+{% endif %}{{ crop.swing_pct }}%
+                  </span>
+              </div>
+          </div>
+
+          <!-- Crop Image -->
+          {% if crop.image %}
+          <div class="crop-img-wrapper" style="width: 100%; height: 180px; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.05);">
+              <img src="{{ crop.image }}" alt="{{ crop.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          {% endif %}
+
+          <div class="metrics-grid">
+              <div class="metric-box">
+                  <span class="metric-label">Mandi Baseline</span>
+                  <span class="metric-val">₹{{ crop.price }}/kg</span>
+              </div>
+              <div class="metric-box">
+                  <span class="metric-label">AI Demand</span>
+                  <span class="metric-val" style="color: var(--trend-color, #64748b);">{{ crop.demand }}</span>
+              </div>
+          </div>
+
+          <div class="strategy-box" style="margin-top: 15px; background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.05);">
+            <h4 class="strategy-title" style="color: #1e293b;">🤖 AI Economic Strategy</h4>
+            <p class="strategy-text">{{ crop.advice }}</p>
+          </div>
+
+          <!-- Quick Update & Retrain Action -->
+          <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.05);">
+              <h5 style="margin: 0 0 10px 0; font-size: 0.8rem; color: #64748b; text-transform: uppercase;">Manual Price Adjustment:</h5>
+              <form method="POST" style="display: flex; gap: 8px; background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.05); padding: 10px; border-radius: var(--radius-sm); margin: 12px 0 0 0; box-shadow: 0 4px 15px rgba(0,0,0,0.02); max-width: none; width: 100%; align-items: center;">
+                  <input type="hidden" name="action" value="update_and_train">
+                  <input type="hidden" name="crop_name" value="{{ crop.name }}">
+                  <div style="flex: 1; position: relative; min-width: 80px;">
+                      <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #64748b; font-weight: 700; font-size: 0.95rem;">₹</span>
+                      <input type="number" step="0.1" name="crop_price" value="{{ crop.price }}" class="market-input" style="margin: 0; padding: 10px 8px 10px 22px; font-size: 1rem; font-weight: 800; color: #4f46e5; width: 100%; height: 42px;">
+                  </div>
+                  <button type="submit" class="market-btn" style="padding: 0 16px; height: 42px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); font-size: 0.85rem; font-weight: 800; white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                      🔄 SYNC & TRAIN
+                  </button>
+              </form>
+              <p style="margin: 8px 0 0 0; font-size: 0.7rem; color: #94a3b8; font-style: italic;">Adjust the price based on your local Mandi records before updating.</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 50px; background: white; border-radius: 12px; border: 1px solid rgba(0,0,0,0.05);">
+          <p style="color: #64748b; font-size: 1.1rem; margin: 0;">No tailored data found for your search. Try a broader commodity term.</p>
+      </div>
+    {% endif %}
+  {% endif %}
+  <hr style="border-color: rgba(0,0,0,0.05); margin: 50px 0;">
+
+  <div class="market-form" data-aos="fade-up">
+    <h3 style="margin: 0 0 10px 0; font-size: 1.4rem; color: #1e293b; font-weight: 800;">📝 Quick Manual Entry</h3>
+    <p style="color: #64748b; margin-bottom: 25px; font-size: 0.95rem;">If you have direct data from a local Mandi, enter it here to update the ledger and retrain the AI.</p>
+    
+    <form method="POST">
+      <input type="hidden" name="action" value="update_and_train">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div>
+            <label style="font-weight: 700; font-size: 0.85rem; color: #475569; display: block; margin-bottom: 8px;">Commodity Name:</label>
+            <input type="text" name="crop_name" class="market-input" style="margin: 0;" placeholder="e.g. Sunflower" required>
+        </div>
+        <div>
+            <label style="font-weight: 700; font-size: 0.85rem; color: #475569; display: block; margin-bottom: 8px;">Current Price (₹/kg):</label>
+            <input type="number" step="0.1" name="crop_price" class="market-input" style="margin: 0;" placeholder="e.g. 42.5" required>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end;">
+        <button type="submit" class="market-btn" style="background: #6366f1;">
+            🚀 SAVE DATA & RETRAIN AI
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .mode-selector { display: flex; gap: 10px; margin-bottom: 25px; }
+  .mode-btn { flex: 1; padding: 12px; border-radius: 12px; border: 1.5px solid rgba(0,0,0,0.05); background: white; cursor: pointer; transition: 0.3s; font-weight: 700; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .mode-btn.active { border-color: #ef4444; color: #ef4444; background: rgba(239, 68, 68, 0.05); }
+  
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .full-width { grid-column: span 2; }
+
+  /* Result Status Themes */
+  .status-stable { --status-color: #10B981; --status-bg: rgba(16, 185, 129, 0.05); --status-border: rgba(16, 185, 129, 0.3); --status-text: #065f46; }
+  .status-threat { --status-color: #ef4444; --status-bg: rgba(239, 68, 68, 0.05); --status-border: rgba(239, 68, 68, 0.3); --status-text: #991b1b; }
+  
+  .crop-card.result-card { border-left: 6px solid var(--status-color); margin-top: 30px; }
+  .dynamic-strategy { background: var(--status-bg); border-color: var(--status-border); }
+  .dynamic-strategy-title { color: var(--status-text); }
+</style>
+
+<h2 data-aos="fade-down">⚠️ Predictive Damage Analysis</h2>
+<p data-aos="fade-in" data-aos-delay="100">
+Determine environmental threats using manual field telemetry or live weather data from our cloud station network.
+</p>
+
+<!-- Analysis Form -->
+<form id="damageForm" method="POST" action="{{ url_for('crop_damage') }}" class="market-form" data-aos="zoom-in" data-aos-delay="200">
+  <input type="hidden" name="source" id="sourceInput" value="{{ telemetry.source_type or 'manual' }}">
+
+  <div class="mode-selector">
+    <button type="button" class="mode-btn {% if telemetry.source_type == 'manual' %}active{% endif %}" onclick="setMode('manual', this)">✍️ Manual Entry</button>
+    <button type="button" class="mode-btn {% if telemetry.source_type == 'weather' %}active{% endif %}" onclick="setMode('weather', this)">📍 Auto-Locate</button>
+  </div>
+
+  <!-- Mandatory Crop Selection for Perenual API Data -->
+  <div class="field-group" style="margin-bottom: 25px;">
+    <label for="plant_name" style="font-weight: 700;">Target Crop (Botanical Evaluation):</label>
+    <input type="text" id="plant_name" name="plant_name" class="market-input" placeholder="e.g. Tomato, Rice, Soybean..." value="{{ telemetry.plant_name or 'Rice' }}" required>
+  </div>
+
+  <!-- Dynamic Fields -->
+  <div id="cityField" class="field-group" {% if telemetry.source_type != 'weather' %}hidden{% endif %} style="margin-bottom: 20px;">
+    <label for="city" style="font-weight: 700;">Nearest Station / City Name:</label>
+    <input type="text" id="city" name="city" class="market-input" placeholder="e.g. Nagpur..." value="Nagpur">
+  </div>
+
+  <div id="manualFields" class="field-group" {% if telemetry.source_type != 'manual' %}hidden{% endif %}>
+    <div class="input-grid">
+      <div>
+        <label for="temperature" style="font-weight: 700;">Temp (°C):</label>
+        <input type="number" step="any" id="temperature" name="temperature" class="market-input" value="{{ telemetry.temp }}" placeholder="e.g. 35">
+      </div>
+      <div>
+        <label for="humidity" style="font-weight: 700;">Humidity (%):</label>
+        <input type="number" step="any" id="humidity" name="humidity" class="market-input" value="{{ telemetry.humid }}" placeholder="e.g. 80">
+      </div>
+      <div class="full-width">
+        <label for="moisture" style="font-weight: 700;">Soil Moisture (%):</label>
+        <input type="number" step="any" id="moisture" name="moisture" class="market-input" value="{{ telemetry.moist }}" placeholder="e.g. 25">
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: flex-end; margin-top: 25px;">
+    <button type="submit" class="market-btn" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); width: 100%;">🚀 RUN DAMAGE ANALYSIS</button>
+  </div>
+</form>
+
+{% if damage_alert %}
+<section class="crop-card result-card {{ telemetry.status_class }}" data-aos="fade-up">
+  <div class="card-header">
+      <h3 class="card-title">🔍 Analysis Result</h3>
+      <div style="text-align: right;">
+          <span class="trend-label">Telemetry Source</span>
+          <span class="trend-value" style="color: #64748b; font-size: 1rem;">{{ telemetry.source_type|upper }} {% if telemetry.location %}({{ telemetry.location }}){% endif %}</span>
+      </div>
+  </div>
+
+  <div class="metrics-grid">
+      <div class="metric-box">
+          <span class="metric-label">Field Temp</span>
+          <span class="metric-val">{{ telemetry.temp }}°C</span>
+      </div>
+      <div class="metric-box">
+          <span class="metric-label">Avg Humidity</span>
+          <span class="metric-val">{{ telemetry.humid }}%</span>
+      </div>
+  </div>
+
+  <div class="strategy-box dynamic-strategy">
+     <h4 class="strategy-title dynamic-strategy-title">
+        {% if 'FIELD STABLE' in damage_alert %}✔️ SYSTEM STABLE{% else %}⚠️ THREAT DETECTED{% endif %}
+     </h4>
+     <p class="strategy-text">{{ damage_alert }}</p>
+  </div>
+</section>
+{% endif %}
+
+<script>
+  function setMode(mode, btn) {
+    document.getElementById('sourceInput').value = mode;
+    
+    // Toggle active state
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Toggle Visibility using hidden attribute
+    const groups = document.querySelectorAll('.field-group');
+    groups.forEach(g => g.hidden = true);
+    
+    if (mode === 'manual') document.getElementById('manualFields').hidden = false;
+    if (mode === 'weather') document.getElementById('cityField').hidden = false;
+  }
+</script>
+
+{% endblock %}

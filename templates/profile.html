@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center">
+  <h1 data-aos="fade-down">🧑‍🌾 Farmer Profile Dashboard</h1>
+  <h2 data-aos="fade-up" data-aos-delay="100">Welcome, {{ username }}!</h2>
+  
+  <p data-aos="fade-in" data-aos-delay="200" style="max-width: 800px; margin: 0 auto; padding-bottom: 20px;">
+    Access all your personalized agricultural tools, predictive insights, and active monitoring probes from your central hub.
+  </p>
+</div>
+
+<div class="app-grid" data-aos="zoom-in" data-aos-delay="300">
+
+    <a href="{{ url_for('crop_requirement') }}" class="app-card">
+      <div class="icon-wrapper">🌾</div>
+      <span>Crop Reqs</span>
+    </a>
+    <a href="{{ url_for('crop_damage') }}" class="app-card">
+      <div class="icon-wrapper">🛡️</div>
+      <span>Threat Guard</span>
+    </a>
+    <a href="{{ url_for('disease_scan') }}" class="app-card">
+      <div class="icon-wrapper">📷</div>
+      <span>Disease Scan</span>
+    </a>
+    <a href="{{ url_for('weather') }}" class="app-card">
+      <div class="icon-wrapper">☁️</div>
+      <span>Weather Irrigation</span>
+    </a>
+    <a href="{{ url_for('market') }}" class="app-card">
+      <div class="icon-wrapper">📈</div>
+      <span>Market Trends</span>
+    </a>
+    <a href="{{ url_for('water_level') }}" class="app-card">
+      <div class="icon-wrapper">💧</div>
+      <span>Water Level</span>
+    </a>
+    <a href="{{ url_for('soil_moisture') }}" class="app-card">
+      <div class="icon-wrapper">🌱</div>
+      <span>Soil Probes</span>
+    </a>
+</div>
+
+<br><br>
+<div class="text-center" data-aos="fade-up" data-aos-delay="400">
+  <a href="{{ url_for('logout') }}" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s ease;">
+    <span>🔒</span> Secure Logout
+  </a>
+</div>
+{% endblock %}

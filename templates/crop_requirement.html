@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 data-aos="fade-down">🤖 AI Geo-Requirement Predictor</h2>
+
+<p data-aos="fade-in" data-aos-delay="100">
+The Smart Irrigation Predictor automatically fetches the live weather conditions for your location, passes them through our <strong>ML Model</strong>, and computes the exact water level needed for a specific crop under current field conditions:
+</p>
+
+<form id="reqForm" method="POST" action="{{ url_for('crop_requirement') }}" data-aos="zoom-in" data-aos-delay="200">
+  <label for="city">Enter Field Location (City):</label>
+  <input type="text" id="city" name="city" required placeholder="e.g. London, Mumbai, etc." style="width: 100%; margin: 8px 0 12px 0; padding: 14px 16px; border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); font-size: 1rem; background: var(--glass-bg); color: #1e293b; display: block;">
+  
+  <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+    <button type="button" id="geoBtn" style="background: rgba(234, 179, 8, 0.1); color: #854d0e; border: 1px solid rgba(234, 179, 8, 0.3); margin: 0; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;" onclick="getLocation()">📍 Auto-Locate Field</button>
+  </div>
+
+  <label for="crop">Select Target Crop Profile:</label>
+  <select id="crop" name="crop" required style="width: 100%; padding: 14px 16px; margin-bottom: 20px; border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); font-size: 1rem; background: var(--glass-bg); color: #1e293b; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2310b981%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.65em auto;">
+    <option value="" disabled selected>Plese choose a crop...</option>
+    <option value="Rice">🌾 Rice (Paddy)</option>
+    <option value="Maize">🌽 Maize (Corn)</option>
+    <option value="Potato">🥔 Potato</option>
+    <option value="Tomato">🍅 Tomato</option>
+    <option value="Sunflower">🌻 Sunflower</option>
+    <option value="Wheat">🌾 Wheat</option>
+  </select>
+
+  <button type="submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-top: 15px; width: 100%;">Analyze Field Requirements</button>
+</form>
+
+<script>
+function getLocation() {
+  const btn = document.getElementById('geoBtn');
+  const cityInput = document.getElementById('city');
+  
+  if (navigator.geolocation) {
+    btn.innerHTML = "Locating...";
+    btn.style.opacity = "0.7";
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude.toFixed(4);
+      const lon = position.coords.longitude.toFixed(4);
+      cityInput.value = lat + "," + lon;
+      btn.innerHTML = "📍 Found";
+      btn.style.opacity = "1";
+    }, function(error) {
+      btn.innerHTML = "📍 Failed";
+      btn.style.opacity = "1";
+      alert("Unable to retrieve location. Please ensure location permissions are enabled or type your city manually.");
+    });
+  } else {
+    alert("Geolocation is not supported by this browser.");
+  }
+}
+</script>
+
+{% if prediction %}
+<section class="highlight" data-aos="fade-up" style="border-left-color: {% if prediction.get('error') %}#ef4444{% else %}#3b82f6{% endif %};">
+  <h3>📊 Machine Learning Analysis</h3>
+  
+  {% if prediction.get('error') %}
+    <p>{{ prediction.get('error') }}</p>
+  {% else %}
+    <ul style="list-style-type: none; padding: 0;">
+      <li>🌍 <strong>Location:</strong> {{ prediction.get('location') }}</li>
+      <li>🌡️ <strong>Live Temperature:</strong> {{ prediction.get('temp') }} °C</li>
+      <li>💧 <strong>Live Humidity:</strong> {{ prediction.get('humid') }} %</li>
+    </ul>
+    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.05);">
+      <h4 style="font-size: 1.2rem; color: #10b981; margin: 0;">🎯 Recommended Soil Moisture: {{ "%.1f"|format(prediction.get('target')) }}%</h4>
+    </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="highlight" data-aos="fade-up" data-aos-delay="300">
+  <h3>Dataset Profiles Guide</h3>
+  <ul>
+    <li>🌾 <strong>Rice</strong>: Requires standing water, warm climate, and fertile soil. (~28°C Temp, ~80% Humid, ~200mm Rain)</li>
+    <li>🌽 <strong>Maize</strong>: Needs moderate irrigation, nitrogen-rich soil, and plenty of sunlight. (~24°C Temp, ~60% Humid, ~100mm Rain)</li>
+    <li>🥔 <strong>Potato</strong>: Prefers cool climate, well-drained soil, and regular watering. (~18°C Temp, ~75% Humid, ~50mm Rain)</li>
+    <li>🍅 <strong>Tomato</strong>: Requires balanced irrigation, warm climate, and nutrient-rich soil. (~25°C Temp, ~65% Humid, ~60mm Rain)</li>
+    <li>🌻 <strong>Sunflower</strong>: Thrives in dry conditions, needs full sunlight, and moderate water. (~30°C Temp, ~50% Humid, ~40mm Rain)</li>
+  </ul>
+</section>
+{% endblock %}

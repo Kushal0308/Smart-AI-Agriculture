@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 data-aos="fade-down">Contact Us</h2>
+
+<p data-aos="fade-in" data-aos-delay="100">If you’d like to request a demo, collaborate, or learn more about the Smart Irrigation Predictor, please reach out using the form below.</p>
+
+<form method="POST" action="mailto:info@smartirrigation.com" enctype="text/plain" data-aos="zoom-in" data-aos-delay="200">
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name" required placeholder="Your full name">
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+
+  <label for="message">Message:</label>
+  <textarea id="message" name="message" rows="5" required placeholder="Type your message here..."></textarea>
+
+  <button type="submit">Send Message</button>
+</form>
+
+<div class="closing" data-aos="fade-up" data-aos-delay="300">
+  <p>You can also email us directly at: <a href="mailto:info@smartirrigation.com">info@smartirrigation.com</a></p>
+</div>
+{% endblock %}

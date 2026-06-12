@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .admin-container { max-width: 1000px; margin: 0 auto; }
+  .admin-card { background: var(--glass-bg); padding: 40px; border-radius: var(--radius-md); border: 1px solid var(--glass-border); margin-bottom: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+  .admin-title { font-size: 2rem; color: #1e293b; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 15px; }
+  .admin-subtitle { color: #64748b; margin-bottom: 30px; font-size: 1.1rem; }
+  
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .tool-card { background: white; padding: 25px; border-radius: 15px; border: 1px solid rgba(0,0,0,0.05); transition: 0.3s; }
+  .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+  .tool-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+  .tool-name { font-size: 1.3rem; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+  .tool-desc { font-size: 0.95rem; color: #64748b; line-height: 1.5; margin-bottom: 20px; }
+  
+  .btn-action { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+  .btn-refresh { background: #3b82f6; color: white; }
+  .btn-train { background: #10b981; color: white; }
+  .btn-add { background: #6366f1; color: white; }
+  
+  .status-banner { padding: 15px 25px; border-radius: 10px; margin-bottom: 30px; font-weight: 600; animation: fadeIn 0.5s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .manual-form { display: grid; gap: 15px; margin-top: 20px; }
+  .input-field { padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 1rem; transition: 0.3s; }
+  .input-field:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+</style>
+
+<div class="admin-container">
+  <div class="admin-card">
+    <h2 class="admin-title">⚙️ Control Center</h2>
+    <p class="admin-subtitle">Manage agricultural datasets, AI models, and market intelligence parameters.</p>
+
+    {% if status_msg %}
+    <div class="status-banner" style="background: rgba(16, 185, 129, 0.1); color: #065f46; border: 1px solid rgba(16, 185, 129, 0.2);">
+      {{ status_msg }}
+    </div>
+    {% endif %}
+
+    <div class="tool-grid">
+      <!-- Refresh Data -->
+      <div class="tool-card">
+        <span class="tool-icon">📊</span>
+        <h3 class="tool-name">Data Synchronization</h3>
+        <p class="tool-desc">Re-sync the local database with the master CSV file. This updates baseline prices for all commodities.</p>
+        <form method="POST">
+          <input type="hidden" name="action" value="refresh_data">
+          <button type="submit" class="btn-action btn-refresh">Sync Database</button>
+        </form>
+      </div>
+
+      <!-- Train Model -->
+      <div class="tool-card">
+        <span class="tool-icon">🧠</span>
+        <h3 class="tool-name">AI Model Training</h3>
+        <p class="tool-desc">Trigger a full re-training cycle for the crop water requirement regressor using fresh synthetic data.</p>
+        <form method="POST">
+          <input type="hidden" name="action" value="train_model">
+          <button type="submit" class="btn-action btn-train">Retrain Model</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Manual Entry -->
+    <div class="tool-card" style="margin-top: 20px; grid-column: span 2;">
+      <span class="tool-icon">📝</span>
+      <h3 class="tool-name">Manual Market Entry</h3>
+      <p class="tool-desc">Inject a single commodity price point directly into the Mandi stats table for immediate analysis.</p>
+      
+      <form method="POST" class="manual-form">
+        <input type="hidden" name="action" value="add_entry">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <input type="text" name="commodity" class="input-field" placeholder="Commodity Name (e.g. Mustard)" required>
+          <input type="number" step="0.1" name="price" class="input-field" placeholder="Price per Kg (₹)" required>
+        </div>
+        <button type="submit" class="btn-action btn-add">Add Entry to Ledger</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<div data-aos="fade-down">
+  <h2>🌱 Soil Moisture Telemetry</h2>
+  <p>Monitor your soil's hydration levels. Maintaining a balanced state avoids under-watering stresses and over-watering risks (e.g., fungal decay).</p>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 40px; margin-top: 30px;" data-aos="fade-in" data-aos-delay="200">
+  
+  <section class="highlight" style="flex: 1; min-width: 300px;">
+    <h3>📡 Intelligent Probes</h3>
+    <p>Query your integrated field probes across various soil quadrants to compute a reliable average moisture condition.</p>
+    <form method="POST" action="{{ url_for('soil_moisture') }}">
+      <input type="hidden" name="source" value="automatic">
+      <label for="plant_name_auto">Crop Name:</label>
+      <input type="text" id="plant_name_auto" name="plant_name" class="market-input" placeholder="e.g. Rice, Tomato..." required>
+      <button type="submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); margin-top: 15px;">Auto-Read Probes</button>
+    </form>
+  </section>
+
+  <section class="highlight" style="flex: 1; min-width: 300px;">
+    <h3>✍️ Direct Log</h3>
+    <p>Submit moisture levels generated via hand-held tools or direct analog measurements from the field.</p>
+    <form style="margin:0; max-width: 100%" method="POST" action="{{ url_for('soil_moisture') }}">
+      <input type="hidden" name="source" value="manual">
+      <label for="plant_name_manual">Crop Name:</label>
+      <input type="text" id="plant_name_manual" name="plant_name" class="market-input" style="margin-bottom: 10px;" placeholder="e.g. Coffee, Wheat..." required>
+      <label for="moisture">Moisture Metric (%):</label>
+      <input type="number" id="moisture" name="moisture" min="0" max="100" required placeholder="e.g. 45">
+      <button type="submit">Record Value</button>
+    </form>
+  </section>
+
+  <section class="highlight" style="flex: 1; min-width: 300px; border-left-color: #3b82f6;">
+    <h3>⚙️ Servo Motor Control</h3>
+    <p>Configure the state and management mode of the irrigation pipe servo motor.</p>
+    
+    <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div>
+        <span>Mode: </span>
+        <strong style="color: {% if settings.soil_servo_mode == 'auto' %}#10b981{% else %}#3b82f6{% endif %}; text-transform: uppercase;">
+          {{ settings.soil_servo_mode }}
+        </strong>
+      </div>
+      <div>
+        <span>State: </span>
+        <strong style="color: {% if settings.soil_servo_state == 'enabled' %}#10b981{% else %}#ef4444{% endif %}; text-transform: uppercase;">
+          {{ settings.soil_servo_state }}
+        </strong>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <form style="margin: 0; padding: 0; box-shadow: none; border: none; max-width: 100%; background: transparent;" method="POST" action="{{ url_for('toggle_servo') }}">
+        <input type="hidden" name="servo_type" value="soil">
+        <input type="hidden" name="action" value="toggle_mode">
+        <input type="hidden" name="redirect_to" value="soil_moisture">
+        <button type="submit" style="background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);">
+          Switch to {% if settings.soil_servo_mode == 'auto' %}Manual{% else %}Automatic{% endif %} Mode
+        </button>
+      </form>
+
+      {% if settings.soil_servo_mode == 'manual' %}
+      <form style="margin: 0; padding: 0; box-shadow: none; border: none; max-width: 100%; background: transparent;" method="POST" action="{{ url_for('toggle_servo') }}">
+        <input type="hidden" name="servo_type" value="soil">
+        <input type="hidden" name="action" value="toggle_state">
+        <input type="hidden" name="redirect_to" value="soil_moisture">
+        <button type="submit" style="background: {% if settings.soil_servo_state == 'enabled' %}#ef4444{% else %}#10b981{% endif %};">
+          {% if settings.soil_servo_state == 'enabled' %}Disable{% else %}Enable{% endif %} Servo Motor
+        </button>
+      </form>
+      {% else %}
+      <button style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none;" disabled>
+        State Controlled Automatically
+      </button>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

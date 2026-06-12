@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 data-aos="fade-down">Training Algorithm</h2>
+
+<p data-aos="fade-in" data-aos-delay="100">
+The Smart Irrigation Predictor uses machine learning to analyze environmental data and predict irrigation needs. 
+Here’s how the training process works:
+</p>
+
+<section class="highlight" data-aos="fade-up" data-aos-delay="200">
+  <h3>Steps in Training</h3>
+  <ol>
+    <li>📥 <strong>Data Collection</strong>: Gather historical data on soil moisture, temperature, humidity, rainfall, and crop type.</li>
+    <li>🧹 <strong>Data Preprocessing</strong>: Clean and normalize the dataset to remove noise and ensure consistency.</li>
+    <li>⚙️ <strong>Feature Selection</strong>: Identify the most important parameters that influence irrigation decisions.</li>
+    <li>📊 <strong>Model Training</strong>: Train machine learning models (e.g., Decision Trees, Random Forests, or Neural Networks) using the processed data.</li>
+    <li>🔍 <strong>Validation</strong>: Test the model on unseen data to measure accuracy and reliability.</li>
+    <li>📈 <strong>Deployment</strong>: Integrate the trained model into the web application for real-time predictions.</li>
+  </ol>
+</section>
+
+<section class="highlight" data-aos="fade-up" data-aos-delay="300">
+  <h3>Outcome</h3>
+  <p>
+  The trained model learns patterns from past data and applies them to current conditions. 
+  This enables the system to recommend whether irrigation is needed, helping farmers save water and improve crop yield.
+  </p>
+</section>
+{% endblock %}

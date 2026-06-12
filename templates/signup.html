@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 data-aos="fade-down">Create Your Farming Account</h1>
+
+{% if error %}
+  <div class="highlight" data-aos="fade-right">
+    <p>{{ error }}</p>
+  </div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('signup') }}" data-aos="zoom-in" data-aos-delay="200">
+  <label for="username">Username</label>
+  <input type="text" id="username" name="username" required placeholder="Choose a username">
+
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" required placeholder="***">
+
+  <label for="security_question">Security Question (For Account Recovery)</label>
+  <select id="security_question" name="security_question" required style="width: 100%; padding: 12px; border: 1.5px solid rgba(0,0,0,0.1); border-radius: 8px; margin-bottom: 20px; font-family: 'Inter', sans-serif; font-size: 0.95rem; background-color: white;">
+    <option value="What is your favorite crop?">🌾 What is your favorite crop?</option>
+    <option value="What is the name of your first pet?">🐶 What is the name of your first pet?</option>
+    <option value="What is your hometown or village name?">🏡 What is your hometown or village name?</option>
+  </select>
+
+  <label for="security_answer">Security Answer</label>
+  <input type="text" id="security_answer" name="security_answer" required placeholder="Type your answer here">
+
+  <button type="submit">Sign Up Now</button>
+</form>
+
+<div class="closing" data-aos="fade-up" data-aos-delay="300">
+  <p>Already registered? <a href="{{ url_for('login') }}">Login here</a></p>
+</div>
+{% endblock %}

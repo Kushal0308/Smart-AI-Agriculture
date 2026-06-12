@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div data-aos="fade-up">
+  <h2>💧 Refill Decision</h2>
+  
+  <div class="highlight" data-aos="fade-right" data-aos-delay="100">
+    <p>{{ message }}</p>
+    <p>Decision explicitly confirmed by: <strong>{{ username }}</strong></p>
+  </div>
+
+  <form action="{{ url_for('home') }}" data-aos="zoom-in" data-aos-delay="200">
+    <button type="submit">Return to Dashboard</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<div data-aos="fade-down">
+  <h2>💧 Water Level Control Panel</h2>
+  <p>Track the tank's water capacity to ensure constant supply for irrigation. You can let the software query your IoT sensor automatically, or document physical readings manually.</p>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 40px; margin-top: 30px;" data-aos="fade-in" data-aos-delay="200">
+  
+  <section class="highlight" style="flex: 1; min-width: 300px;">
+    <h3>📡 Automatic Sensor Reading</h3>
+    <p>Simulate fetching the latest data from the attached remote reservoir sensor. This establishes connection with the hardware via REST.</p>
+    <form method="POST" action="{{ url_for('water_level') }}">
+      <input type="hidden" name="source" value="automatic">
+      <button type="submit" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); margin-top: 15px;">Fetch Sensor Reading</button>
+    </form>
+  </section>
+
+  <section class="highlight" style="flex: 1; min-width: 300px;">
+    <h3>✍️ Manual Entry</h3>
+    <p>Provide the water level explicitly. Helpful when sensors go offline or during routine maintenance checks.</p>
+    <form style="margin:0; max-width: 100%" method="POST" action="{{ url_for('water_level') }}">
+      <input type="hidden" name="source" value="manual">
+      <label for="level">Volume / Level (%):</label>
+      <input type="number" id="level" name="level" min="0" max="100" required placeholder="e.g. 50">
+      <button type="submit">Submit Entry</button>
+    </form>
+  </section>
+
+  <section class="highlight" style="flex: 1; min-width: 300px; border-left-color: #3b82f6;">
+    <h3>⚙️ Water Valve Servo Control</h3>
+    <p>Configure the state and management mode of the reservoir inlet valve servo motor.</p>
+    
+    <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px;">
+      <div>
+        <span>Mode: </span>
+        <strong style="color: {% if settings.water_servo_mode == 'auto' %}#10b981{% else %}#3b82f6{% endif %}; text-transform: uppercase;">
+          {{ settings.water_servo_mode }}
+        </strong>
+      </div>
+      <div>
+        <span>State: </span>
+        <strong style="color: {% if settings.water_servo_state == 'enabled' %}#10b981{% else %}#ef4444{% endif %}; text-transform: uppercase;">
+          {{ settings.water_servo_state }}
+        </strong>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <form style="margin: 0; padding: 0; box-shadow: none; border: none; max-width: 100%; background: transparent;" method="POST" action="{{ url_for('toggle_servo') }}">
+        <input type="hidden" name="servo_type" value="water">
+        <input type="hidden" name="action" value="toggle_mode">
+        <input type="hidden" name="redirect_to" value="water_level">
+        <button type="submit" style="background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);">
+          Switch to {% if settings.water_servo_mode == 'auto' %}Manual{% else %}Automatic{% endif %} Mode
+        </button>
+      </form>
+
+      {% if settings.water_servo_mode == 'manual' %}
+      <form style="margin: 0; padding: 0; box-shadow: none; border: none; max-width: 100%; background: transparent;" method="POST" action="{{ url_for('toggle_servo') }}">
+        <input type="hidden" name="servo_type" value="water">
+        <input type="hidden" name="action" value="toggle_state">
+        <input type="hidden" name="redirect_to" value="water_level">
+        <button type="submit" style="background: {% if settings.water_servo_state == 'enabled' %}#ef4444{% else %}#10b981{% endif %};">
+          {% if settings.water_servo_state == 'enabled' %}Disable{% else %}Enable{% endif %} Servo Motor
+        </button>
+      </form>
+      {% else %}
+      <button style="background: #e2e8f0; color: #94a3b8; cursor: not-allowed; box-shadow: none;" disabled>
+        State Controlled Automatically
+      </button>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div data-aos="fade-up">
+  <h2>🌱 Soil Moisture Status</h2>
+  
+  <div class="highlight">
+    <p>Status: <strong>{{ status }}</strong></p>
+    <p>{{ message }}</p>
+  </div>
+  
+  <div class="highlight" data-aos="fade-left" data-aos-delay="100" style="border-left-color: #3b82f6;">
+    <h3>⚙️ Servo Control Link</h3>
+    <p>Hardware Response: <strong style="color: {% if 'Opened' in servo_status or 'Open' in servo_status %}#10b981{% else %}#ef4444{% endif %};">{{ servo_status }}</strong></p>
+    <p style="font-size: 0.9em; opacity: 0.8; margin-bottom: 20px;">
+      Mode: <strong style="text-transform: uppercase; color: {% if settings.soil_servo_mode == 'auto' %}#10b981{% else %}#3b82f6{% endif %};">{{ settings.soil_servo_mode }}</strong> | 
+      State: <strong style="text-transform: uppercase; color: {% if settings.soil_servo_state == 'enabled' %}#10b981{% else %}#ef4444{% endif %};">{{ settings.soil_servo_state }}</strong>
+    </p>
+
+    <!-- Quick Controller on Status Page -->
+    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+      <form style="margin: 0; padding: 0; box-shadow: none; border: none; background: transparent; display: inline;" method="POST" action="{{ url_for('toggle_servo') }}">
+        <input type="hidden" name="servo_type" value="soil">
+        <input type="hidden" name="action" value="toggle_mode">
+        <!-- We can redirect to the soil_moisture dashboard to see details -->
+        <input type="hidden" name="redirect_to" value="soil_moisture">
+        <button type="submit" style="width: auto; padding: 8px 16px; font-size: 0.9rem; background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);">
+          Switch to {% if settings.soil_servo_mode == 'auto' %}Manual{% else %}Auto{% endif %} Mode
+        </button>
+      </form>
+
+      {% if settings.soil_servo_mode == 'manual' %}
+      <form style="margin: 0; padding: 0; box-shadow: none; border: none; background: transparent; display: inline;" method="POST" action="{{ url_for('toggle_servo') }}">
+        <input type="hidden" name="servo_type" value="soil">
+        <input type="hidden" name="action" value="toggle_state">
+        <input type="hidden" name="redirect_to" value="soil_moisture">
+        <button type="submit" style="width: auto; padding: 8px 16px; font-size: 0.9rem; background: {% if settings.soil_servo_state == 'enabled' %}#ef4444{% else %}#10b981{% endif %};">
+          {% if settings.soil_servo_state == 'enabled' %}Disable{% else %}Enable{% endif %} Servo
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <form action="{{ url_for('home') }}" data-aos="zoom-in" data-aos-delay="200">
+    <button type="submit">Return to Dashboard</button>
+  </form>
+</div>
+{% endblock %}

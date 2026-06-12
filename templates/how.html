@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 data-aos="fade-down">How It Works</h2>
+
+<p data-aos="fade-in" data-aos-delay="100">
+The Smart Irrigation Predictor combines sensor data, weather information, and crop requirements to provide intelligent irrigation recommendations. 
+Here’s the workflow:
+</p>
+
+<section class="highlight" data-aos="fade-up" data-aos-delay="200">
+  <h3>Workflow</h3>
+  <ol>
+    <li>📥 <strong>Inputs</strong>: Soil moisture, temperature, humidity, rainfall prediction, and crop type.</li>
+    <li>⚙️ <strong>Processing</strong>: Data is analyzed using machine learning algorithms trained on historical patterns.</li>
+    <li>🌦️ <strong>Weather Integration</strong>: Real-time weather data is factored in to avoid unnecessary irrigation when rain is expected.</li>
+    <li>🌱 <strong>Crop Requirements</strong>: Each crop’s water and nutrient needs are matched against the current conditions.</li>
+    <li>📊 <strong>Prediction</strong>: The system decides whether irrigation is required, and if so, suggests optimal timing and duration.</li>
+    <li>👨‍🌾 <strong>Output</strong>: Farmers receive clear recommendations to conserve water, reduce electricity usage, and improve yields.</li>
+  </ol>
+</section>
+
+<section class="highlight" data-aos="fade-up" data-aos-delay="300">
+  <h3>Block Diagram (Conceptual)</h3>
+  <p>
+  Inputs → AI Model → Weather Data → Crop Requirements → Irrigation Recommendation → Farmer Action
+  </p>
+
+  <p>
+  This integrated approach ensures smarter farming decisions, resource conservation, and sustainable agriculture.
+  </p>
+</section>
+{% endblock %}
