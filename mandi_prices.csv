@@ -1,0 +1,31 @@
+State,Market,Commodity,Variety,Arrival_Date,Modal_Price_Kg
+Maharashtra,Nagpur,Wheat,Local,2026-05-01,26.5
+Maharashtra,Nagpur,Cotton,Long Staple,2026-05-05,78.0
+Madhya Pradesh,Indore,Soybean,Yellow,2026-05-02,56.0
+Madhya Pradesh,Indore,Wheat,Lok-1,2026-05-03,27.5
+Uttar Pradesh,Lucknow,Rice,Basmati,2026-05-04,72.0
+Uttar Pradesh,Lucknow,Tomato,Hybrid,2026-05-06,24.0
+Karnataka,Bangalore,Tomato,Local,2026-05-05,21.0
+Karnataka,Bangalore,Rice,Sona Masuri,2026-05-02,54.0
+Punjab,Amritsar,Wheat,PBW 343,2026-05-01,25.5
+Punjab,Amritsar,Rice,Basmati 1121,2026-05-01,79.0
+Gujarat,Ahmedabad,Cotton,Shankar 6,2026-05-04,74.0
+Gujarat,Ahmedabad,Onion,Red,2026-05-02,22.0
+Rajasthan,Jaipur,Soybean,G-4,2026-05-01,53.0
+Rajasthan,Jaipur,Wheat,Dara,2026-05-03,24.5
+Tamil Nadu,Chennai,Rice,Ponni,2026-05-05,61.0
+Tamil Nadu,Chennai,Tomato,Summer,2026-05-06,28.0
+Maharashtra,Pune,Onion,Common,2026-05-05,21.0
+Maharashtra,Pune,Soybean,Vasco,2026-05-03,55.0
+Andhra Pradesh,Vijayawada,Rice,BPT,2026-05-02,51.0
+Andhra Pradesh,Vijayawada,Cotton,Bunny,2026-05-04,73.5
+Haryana,Karnal,Wheat,Sharbati,2026-05-05,29.0
+West Bengal,Kolkata,Rice,Swarna,2026-05-04,42.0
+Bihar,Patna,Potato,Jyoti,2026-05-06,18.0
+Rajasthan,Kota,Mustard,Black,2026-05-03,58.0
+Karnataka,Davanagere,Maize,Hybrid,2026-05-02,21.5
+Maharashtra,Nashik,Onion,Red,2026-05-06,24.5
+Uttar Pradesh,Agra,Potato,Desi,2026-05-05,16.5
+Punjab,Ludhiana,Wheat,HD 2967,2026-05-04,26.0
+Andhra Pradesh,Guntur,Chilli,Guntur Sannam,2026-05-06,185.0
+Kerala,Kochi,Pepper,Black,2026-05-05,620.0
